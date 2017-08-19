@@ -4,7 +4,7 @@ from functools import wraps
 
 from pyramid.threadlocal import get_current_registry
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
-
+from pyramid.settings import aslist
 from social_core.utils import setting_name, module_member, get_strategy
 from social_core.backends.utils import get_backend, user_backends_data
 
@@ -29,7 +29,8 @@ def load_strategy(request):
 
 
 def load_backend(strategy, name, redirect_uri):
-    backends = get_helper('AUTHENTICATION_BACKENDS')
+    _s = get_helper('AUTHENTICATION_BACKENDS')
+    backends = _s if isinstance(_s, (tuple, list, set)) else aslist(_s)
     Backend = get_backend(backends, name)
     return Backend(strategy=strategy, redirect_uri=redirect_uri)
 
